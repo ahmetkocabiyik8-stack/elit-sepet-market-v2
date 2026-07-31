@@ -1,0 +1,113 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-gold: var(--gold);
+  --color-gold-foreground: var(--gold-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --font-display: "Cormorant Garamond", serif;
+  --font-sans: "Inter", sans-serif;
+}
+
+:root {
+  --radius: 0.625rem;
+
+  /* Warm off-white backgrounds — inviting, not clinical */
+  --background:        oklch(0.974 0.005 75);   /* barely warm cream-gray */
+  --foreground:        oklch(0.12 0.018 50);    /* warm charcoal, not cold black */
+  --card:              oklch(1 0 0);             /* pure white cards */
+  --card-foreground:   oklch(0.12 0.018 50);
+
+  --primary:           oklch(0.44 0.19 155);    /* brand green */
+  --primary-foreground:oklch(1 0 0);
+
+  --secondary:         oklch(0.964 0.005 70);   /* warm light gray */
+  --secondary-foreground: oklch(0.25 0.01 50);
+
+  --muted:             oklch(0.96 0.004 70);
+  --muted-foreground:  oklch(0.52 0.01 55);     /* warm medium gray */
+
+  --accent:            oklch(0.96 0.004 70);
+  --accent-foreground: oklch(0.25 0.01 50);
+
+  /* Brand green — buttons, prices, active states */
+  --gold:              oklch(0.44 0.19 155);
+  --gold-foreground:   oklch(1 0 0);
+
+  /* Warm orange — campaign, promotions, fire highlights */
+  --orange:            oklch(0.67 0.19 48);
+  --orange-fg:         oklch(1 0 0);
+
+  --border:            oklch(0.906 0.006 65);   /* warm subtle border */
+  --input:             oklch(0.97 0.003 70);
+  --ring:              oklch(0.44 0.19 155);
+  --destructive:       oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(1 0 0);
+
+  --shadow-card:  0 1px 4px 0 rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04);
+  --shadow-soft:  0 4px 16px -6px rgba(0,0,0,0.1);
+  --shadow-green: 0 6px 20px -8px oklch(0.44 0.19 155 / 0.45);
+  --shadow-orange:0 6px 20px -8px oklch(0.67 0.19 48 / 0.4);
+}
+
+.dark {
+  --background: oklch(0.15 0.01 60);
+  --foreground: oklch(0.95 0.005 90);
+  --card: oklch(0.2 0.015 60);
+  --card-foreground: oklch(0.95 0.005 90);
+  --primary: oklch(0.95 0.005 90);
+  --primary-foreground: oklch(0.18 0.015 60);
+  --secondary: oklch(0.25 0.015 60);
+  --secondary-foreground: oklch(0.95 0.005 90);
+  --muted: oklch(0.25 0.015 60);
+  --muted-foreground: oklch(0.7 0.02 60);
+  --accent: oklch(0.28 0.02 70);
+  --accent-foreground: oklch(0.95 0.005 90);
+  --gold: oklch(0.58 0.17 155);
+  --gold-foreground: oklch(1 0 0);
+  --orange: oklch(0.72 0.17 48);
+  --orange-fg: oklch(1 0 0);
+  --border: oklch(0.3 0.015 60);
+  --input: oklch(0.3 0.015 60);
+  --ring: oklch(0.58 0.17 155);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.15 0.01 60);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  h1, h2, h3, .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+}
