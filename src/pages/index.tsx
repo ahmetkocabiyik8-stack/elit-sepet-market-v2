@@ -256,7 +256,7 @@ export default function IndexPage() {
               Aradığınız kriterlere uygun ürün bulunamadı.
             </div>
           ) : (
-            <div className="grid grid-cols-5 gap-2">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
               {filtered.map((p) => {
                 const qty = cart[p.id] || 0;
                 const isFirsat = p.category === "firsat";
