@@ -294,13 +294,13 @@ export default function IndexPage() {
                     </button>
 
                     {/* Image */}
-                    <div className="grid h-36 place-items-center overflow-hidden rounded-lg bg-[#f7f7f7] ring-1 ring-border">
+                    <div className="grid h-48 place-items-center overflow-hidden rounded-lg bg-[#f7f7f7] ring-1 ring-border">
                       {p.image ? (
                         <img
                           src={p.image}
                           alt={p.name}
                           loading="lazy"
-                          className="h-full w-full object-cover p-0 transition-transform duration-500 group-hover:scale-105"
+                          className="h-full w-full object-contain p-2"
                         />
                       ) : (
                         <span className="text-5xl">{p.emoji}</span>
@@ -411,7 +411,7 @@ export default function IndexPage() {
                   <li key={i.id} className="flex items-center gap-3 px-6 py-4">
                     <div className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-lg bg-secondary text-xl">
                       {i.image ? (
-                        <img src={i.image} alt={i.name} loading="lazy" className="h-full w-full object-cover" />
+                        <img src={i.image} alt={i.name} loading="lazy" className="h-full w-full  object-contain p-2"  />
                       ) : (
                         i.emoji
                       )}
