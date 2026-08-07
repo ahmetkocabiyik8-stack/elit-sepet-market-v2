@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "wouter";
 import { Search, Plus, Minus, ShoppingBag, Trash2, X, MessageCircle, Phone, User, KeyRound, CreditCard, Wallet, Lock, Heart } from "lucide-react";
-import { categories, useProducts, effectivePrice, discountPercent, type Product } from "@/lib/products";
+import { categories, useProducts, effectivePrice, discountPercent, isOutOfStock, type Product } from "@/lib/products";
 import aryomKoruImage from "@/assets/aryom-koru.jpg";
 
 const WHATSAPP_NUMBER = "905324556076";
@@ -36,6 +36,7 @@ export default function IndexPage() {
 
   const filtered = useMemo(() => {
     return products.filter((p) => {
+      if (isOutOfStock(p)) return false; // Stoğu bitenler ana sayfada gösterilmez
       if (activeCat === "favs") return favorites.has(p.id);
       const catOk = activeCat === "all" || p.category === activeCat;
       const q = query.trim().toLowerCase();
@@ -58,7 +59,14 @@ export default function IndexPage() {
   const total = cartItems.reduce((s, i) => s + effectivePrice(i) * i.qty, 0);
   const itemCount = cartItems.reduce((s, i) => s + i.qty, 0);
 
-  const add = (id: string) => setCart((c) => ({ ...c, [id]: (c[id] || 0) + 1 }));
+  const add = (id: string) =>
+    setCart((c) => {
+      const p = products.find((x) => x.id === id);
+      const current = c[id] || 0;
+      // Stok takip ediliyorsa, sepete stoktan fazla eklenemez
+      if (p && typeof p.stock === "number" && current >= p.stock) return c;
+      return { ...c, [id]: current + 1 };
+    });
   const dec = (id: string) =>
     setCart((c) => {
       const n = (c[id] || 0) - 1;
@@ -330,25 +338,32 @@ export default function IndexPage() {
                         )}
                         <div className="mt-0.5 text-[10px] text-muted-foreground">/ {p.unit}</div>
                       </div>
-                      {qty === 0 ? (
-                        <button
-                          onClick={() => add(p.id)}
-                          className="flex items-center gap-1 rounded-full bg-gold px-3 py-2 text-xs font-semibold text-gold-foreground shadow-[var(--shadow-green)] transition hover:opacity-90"
-                        >
-                          <Plus className="h-3.5 w-3.5" strokeWidth={2.5} />
-                          Ekle
-                        </button>
-                      ) : (
-                        <div className="flex items-center gap-0.5 rounded-full border-2 border-gold bg-gold/10 p-0.5">
-                          <button onClick={() => dec(p.id)} className="grid h-7 w-7 place-items-center rounded-full text-gold transition hover:bg-gold hover:text-gold-foreground">
-                            <Minus className="h-3 w-3" strokeWidth={2.5} />
+                      {(() => {
+                        const atMax = typeof p.stock === "number" && qty >= p.stock;
+                        return qty === 0 ? (
+                          <button
+                            onClick={() => add(p.id)}
+                            className="flex items-center gap-1 rounded-full bg-gold px-3 py-2 text-xs font-semibold text-gold-foreground shadow-[var(--shadow-green)] transition hover:opacity-90"
+                          >
+                            <Plus className="h-3.5 w-3.5" strokeWidth={2.5} />
+                            Ekle
                           </button>
-                          <span className="min-w-[22px] text-center text-sm font-bold text-foreground">{qty}</span>
-                          <button onClick={() => add(p.id)} className="grid h-7 w-7 place-items-center rounded-full text-gold transition hover:bg-gold hover:text-gold-foreground">
-                            <Plus className="h-3 w-3" strokeWidth={2.5} />
-                          </button>
-                        </div>
-                      )}
+                        ) : (
+                          <div className="flex items-center gap-0.5 rounded-full border-2 border-gold bg-gold/10 p-0.5">
+                            <button onClick={() => dec(p.id)} className="grid h-7 w-7 place-items-center rounded-full text-gold transition hover:bg-gold hover:text-gold-foreground">
+                              <Minus className="h-3 w-3" strokeWidth={2.5} />
+                            </button>
+                            <span className="min-w-[22px] text-center text-sm font-bold text-foreground">{qty}</span>
+                            <button
+                              onClick={() => add(p.id)}
+                              disabled={atMax}
+                              className="grid h-7 w-7 place-items-center rounded-full text-gold transition hover:bg-gold hover:text-gold-foreground disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-gold"
+                            >
+                              <Plus className="h-3 w-3" strokeWidth={2.5} />
+                            </button>
+                          </div>
+                        );
+                      })()}
                     </div>
                   </article>
                 );

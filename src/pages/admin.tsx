@@ -262,6 +262,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                         <th className="px-4 py-3">İndirimli Fiyat (₺)</th>
                         <th className="px-4 py-3">İndirim</th>
                         <th className="px-4 py-3">Birim</th>
+                        <th className="px-4 py-3">Stok</th>
                         <th className="px-4 py-3"></th>
                       </tr>
                     </thead>
@@ -353,6 +354,27 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                               onChange={(e) => update(p.id, { unit: e.target.value })}
                               className="w-24 rounded-lg border border-border bg-background px-2 py-1.5 text-foreground outline-none focus:border-gold/60"
                             />
+                          </td>
+                          <td className="px-4 py-3">
+                            <input
+                              type="number"
+                              min={0}
+                              step="1"
+                              value={p.stock ?? ""}
+                              placeholder="Sınırsız"
+                              onChange={(e) => {
+                                const v = e.target.value;
+                                update(p.id, { stock: v === "" ? undefined : Math.max(0, parseInt(v, 10) || 0) });
+                              }}
+                              className={`w-24 rounded-lg border px-2 py-1.5 text-right tabular-nums outline-none focus:border-gold/60 ${
+                                typeof p.stock === "number" && p.stock <= 0
+                                  ? "border-destructive/50 bg-destructive/10 text-destructive"
+                                  : "border-border bg-background text-foreground"
+                              }`}
+                            />
+                            {typeof p.stock === "number" && p.stock <= 0 && (
+                              <div className="mt-1 text-[10px] font-medium text-destructive">Tükendi</div>
+                            )}
                           </td>
                           <td className="px-4 py-3 text-right">
                             <button
