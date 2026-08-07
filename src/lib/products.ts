@@ -16,12 +16,20 @@ export type Product = {
   unit: string;
   emoji: string;
   image?: string;
+  // Stok takibi: tanımsız/boş (undefined) ise stok takibi yapılmaz, ürün her zaman görünür.
+  // Bir sayı girilirse (örn. 15), o kadar stok olduğu varsayılır. 0'a düşünce ürün ana sayfada gizlenir.
+  stock?: number;
 };
 
 export function effectivePrice(p: Product): number {
   return typeof p.salePrice === "number" && p.salePrice > 0 && p.salePrice < p.price
     ? p.salePrice
     : p.price;
+}
+
+// Stok takip ediliyorsa (stock bir sayıysa) ve 0 veya altındaysa ürün stokta yok demektir.
+export function isOutOfStock(p: Product): boolean {
+  return typeof p.stock === "number" && p.stock <= 0;
 }
 
 export function discountPercent(p: Product): number {
@@ -54,6 +62,7 @@ type ProductRow = {
   unit: string;
   emoji: string;
   image_url: string | null;
+  stock: number | null;
 };
 
 function rowToProduct(r: ProductRow): Product {
@@ -66,6 +75,7 @@ function rowToProduct(r: ProductRow): Product {
     unit: r.unit,
     emoji: r.emoji,
     image: r.image_url || undefined,
+    stock: r.stock != null ? Number(r.stock) : undefined,
   };
 }
 
@@ -79,6 +89,7 @@ function productToRow(p: Product): ProductRow {
     unit: p.unit,
     emoji: p.emoji,
     image_url: p.image || null,
+    stock: p.stock ?? null,
   };
 }
 
