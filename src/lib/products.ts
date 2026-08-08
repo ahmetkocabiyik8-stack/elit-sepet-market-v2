@@ -41,6 +41,13 @@ export function discountPercent(p: Product): number {
 
 export const ADMIN_PIN = "168168";
 
+// Özel/rezerve ürün kimlikleri: bunlar normal ürün listesinde GÖRÜNMEZ,
+// admin panelindeki "Tanıtım Kutusu" ve "Üst Banner (Kayan Görsel)" bölümlerini yönetmek için kullanılır.
+export const PROMO_ID = "__promo__";
+export const HERO_IDS = ["__hero_1__", "__hero_2__", "__hero_3__", "__hero_4__", "__hero_5__"] as const;
+export const CERT_IDS = ["__cert_1__", "__cert_2__", "__cert_3__", "__cert_4__", "__cert_5__"] as const;
+export const RESERVED_IDS: string[] = [PROMO_ID, ...HERO_IDS, ...CERT_IDS];
+
 export const categories = [
   { id: "all", name: "Tümü" },
   { id: "firsat", name: "Haftanın Fırsat Ürünleri" },
