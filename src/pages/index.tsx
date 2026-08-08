@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
 import { Search, Plus, Minus, ShoppingBag, Trash2, X, MessageCircle, Phone, User, KeyRound, CreditCard, Wallet, Lock, Heart, Play, ShieldCheck } from "lucide-react";
-import { categories, useProducts, effectivePrice, discountPercent, isOutOfStock, type Product } from "@/lib/products";
+import { categories, useProducts, effectivePrice, discountPercent, isOutOfStock, PROMO_ID, HERO_IDS, CERT_IDS, RESERVED_IDS, type Product } from "@/lib/products";
 import aryomKoruImage from "@/assets/aryom-koru.jpg";
 import heroSut from "@/assets/hero-sut.jpg";
 import heroKasa from "@/assets/hero-kasa.jpg";
@@ -17,23 +17,26 @@ const WHATSAPP_NUMBER = "905324556076";
 const MARKET_NAME = "Aryom Market";
 
 // ---- Üst kayan görsel (hero slider) ----
-// İleride video eklemek için: her slaytta "video" alanına video dosyasının yolunu yazman yeterli
-// (örn. video: "@/assets/cig-kofte-video.mp4" gibi bir import). Video tanımlıysa resim yerine video oynar.
-const HERO_SLIDES: { image: string; title: string; subtitle: string }[] = [
+// İlk 3 görsel için varsayılan fotoğraflar hazır gelir. 4. ve 5. görseller admin panelinden
+// yüklenmeden önce hiç gösterilmez — yüklenince otomatik olarak sıraya eklenir.
+const DEFAULT_HERO_FALLBACK: ({ image: string; title: string; subtitle: string } | null)[] = [
   { image: heroSut, title: "Taze Süt & Süt Ürünleri", subtitle: "Her gün taze, kapınıza kadar" },
   { image: heroKasa, title: "Hızlı ve Güler Yüzlü Hizmet", subtitle: "Siparişiniz dakikalar içinde hazır" },
   { image: heroCips, title: "Geniş Atıştırmalık Reyonu", subtitle: "Aradığınız her marka burada" },
+  null,
+  null,
 ];
 
-function HeroSlider() {
+function HeroSlider({ slides }: { slides: { image: string; title: string; subtitle: string }[] }) {
   const [current, setCurrent] = useState(0);
   useEffect(() => {
-    const t = setInterval(() => setCurrent((c) => (c + 1) % HERO_SLIDES.length), 3500);
+    if (current >= slides.length) setCurrent(0);
+    const t = setInterval(() => setCurrent((c) => (c + 1) % slides.length), 3500);
     return () => clearInterval(t);
-  }, []);
+  }, [slides.length]);
   return (
     <div className="relative mx-auto mt-4 h-[190px] w-full max-w-[1600px] overflow-hidden rounded-2xl sm:h-[240px] lg:h-[280px]">
-      {HERO_SLIDES.map((s, i) => (
+      {slides.map((s, i) => (
         <div
           key={i}
           className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${i === current ? "opacity-100" : "opacity-0"}`}
@@ -46,7 +49,7 @@ function HeroSlider() {
         </div>
       ))}
       <div className="absolute bottom-4 right-5 flex gap-2">
-        {HERO_SLIDES.map((_, i) => (
+        {slides.map((_, i) => (
           <span key={i} className={`h-2 w-2 rounded-full transition-colors ${i === current ? "bg-white" : "bg-white/50"}`} />
         ))}
       </div>
@@ -60,7 +63,7 @@ function HeroSlider() {
 type PromoMedia = { type: "image"; src: string } | { type: "video"; src: string };
 const DEFAULT_PROMO_MEDIA: PromoMedia = { type: "image", src: cigKofteImage };
 
-const CERT_DOCS = [
+const DEFAULT_CERT_DOCS = [
   { src: certMarka, label: "Marka Tescil Belgesi" },
   { src: certIso, label: "ISO 22000:2018" },
   { src: certHijyen, label: "Hijyen Belgesi" },
@@ -68,11 +71,12 @@ const CERT_DOCS = [
   { src: certTavsiye, label: "Tüketici Tavsiye Sertifikası" },
 ];
 
-function CertifiedProductBox({ media, onOpen }: { media: PromoMedia; onOpen: () => void }) {
+function CertifiedProductBox({ media, title, showCerts, onOpen }: { media: PromoMedia; title: string; showCerts: boolean; onOpen: () => void }) {
+  const Wrapper = showCerts ? "button" : "div";
   return (
-    <button
-      onClick={onOpen}
-      className="group relative h-[220px] w-[220px] shrink-0 overflow-hidden rounded-2xl border border-border bg-card text-left shadow-[var(--shadow-soft)] transition hover:-translate-y-0.5 sm:h-[250px] sm:w-[250px]"
+    <Wrapper
+      onClick={showCerts ? onOpen : undefined}
+      className={`group relative h-[220px] w-[220px] shrink-0 overflow-hidden rounded-2xl border border-border bg-card text-left shadow-[var(--shadow-soft)] transition sm:h-[250px] sm:w-[250px] ${showCerts ? "hover:-translate-y-0.5" : ""}`}
     >
       <span className="absolute left-2.5 top-2.5 z-10 rounded-full bg-[var(--orange)] px-2.5 py-1 text-[10px] font-bold text-white shadow-[var(--shadow-orange)]">
         YENİ ÜRÜN
@@ -87,24 +91,28 @@ function CertifiedProductBox({ media, onOpen }: { media: PromoMedia; onOpen: () 
           playsInline
         />
       ) : (
-        <img src={media.src} alt="Battalbey Çiğ Köfte" className="h-[62%] w-full object-contain bg-white p-2" loading="lazy" />
+        <img src={media.src} alt="Ürün" className="h-[62%] w-full object-contain bg-white p-2" loading="lazy" />
       )}
       <div className="px-3.5 pb-3 pt-2">
-        <h4 className="font-display text-[13.5px] leading-tight text-foreground">Battalbey Çiğ Köfte</h4>
-        <div className="mt-1.5 flex flex-wrap gap-1">
-          <span className="rounded-md bg-blue-500/10 px-1.5 py-0.5 text-[8.5px] font-bold text-blue-600">✓ ISO 22000</span>
-          <span className="rounded-md bg-emerald-500/10 px-1.5 py-0.5 text-[8.5px] font-bold text-emerald-600">✓ Helal</span>
-          <span className="rounded-md bg-amber-500/10 px-1.5 py-0.5 text-[8.5px] font-bold text-amber-600">✓ Hijyen</span>
-        </div>
+        <h4 className="font-display text-[13.5px] leading-tight text-foreground">{title}</h4>
+        {showCerts && (
+          <div className="mt-1.5 flex flex-wrap gap-1">
+            <span className="rounded-md bg-blue-500/10 px-1.5 py-0.5 text-[8.5px] font-bold text-blue-600">✓ ISO 22000</span>
+            <span className="rounded-md bg-emerald-500/10 px-1.5 py-0.5 text-[8.5px] font-bold text-emerald-600">✓ Helal</span>
+            <span className="rounded-md bg-amber-500/10 px-1.5 py-0.5 text-[8.5px] font-bold text-amber-600">✓ Hijyen</span>
+          </div>
+        )}
       </div>
-      <span className="absolute bottom-2.5 right-2.5 rounded-full bg-black/55 px-2 py-1 text-[8.5px] font-medium text-white">
-        Belgeleri gör →
-      </span>
-    </button>
+      {showCerts && (
+        <span className="absolute bottom-2.5 right-2.5 rounded-full bg-black/55 px-2 py-1 text-[8.5px] font-medium text-white">
+          Belgeleri gör →
+        </span>
+      )}
+    </Wrapper>
   );
 }
 
-function CertModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+function CertModal({ open, onClose, docs }: { open: boolean; onClose: () => void; docs: { src: string; label: string }[] }) {
   const [lightbox, setLightbox] = useState<string | null>(null);
   if (!open) return null;
   return (
@@ -116,7 +124,7 @@ function CertModal({ open, onClose }: { open: boolean; onClose: () => void }) {
         <div className="mb-4 flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2 font-display text-lg text-foreground">
-              <ShieldCheck className="h-5 w-5 text-emerald-600" /> Battalbey Çiğ Köfte — Resmi Belgeler
+              <ShieldCheck className="h-5 w-5 text-emerald-600" /> Resmi Belgeler
             </div>
             <div className="mt-1 text-xs text-muted-foreground">Büyütmek için görsele tıklayın.</div>
           </div>
@@ -125,9 +133,9 @@ function CertModal({ open, onClose }: { open: boolean; onClose: () => void }) {
           </button>
         </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {CERT_DOCS.map((c) => (
+          {docs.map((c, i) => (
             <button
-              key={c.label}
+              key={i}
               onClick={() => setLightbox(c.src)}
               className="overflow-hidden rounded-xl border border-border text-left"
             >
@@ -154,14 +162,43 @@ function CertModal({ open, onClose }: { open: boolean; onClose: () => void }) {
 
 export default function IndexPage() {
   const rawProducts = useProducts();
-  const products = useMemo(() => rawProducts.filter((p) => p.id !== "__promo__"), [rawProducts]);
-  const promoItem = useMemo(() => rawProducts.find((p) => p.id === "__promo__"), [rawProducts]);
+  const products = useMemo(() => rawProducts.filter((p) => !RESERVED_IDS.includes(p.id)), [rawProducts]);
+  const promoItem = useMemo(() => rawProducts.find((p) => p.id === PROMO_ID), [rawProducts]);
   const promoMedia: PromoMedia = useMemo(() => {
     if (promoItem && promoItem.image) {
       return { type: promoItem.category === "promo-video" ? "video" : "image", src: promoItem.image };
     }
     return DEFAULT_PROMO_MEDIA;
   }, [promoItem]);
+  const promoTitle = promoItem?.name?.trim() || "Battalbey Çiğ Köfte";
+  // Belgeleri gösterme ayarı, admin panelindeki onay kutusuyla kontrol edilir (price alanı 0/1 olarak kullanılıyor).
+  const showCerts = promoItem ? promoItem.price !== 0 : true;
+
+  const certDocs = useMemo(() => {
+    return CERT_IDS.map((id, i) => {
+      const item = rawProducts.find((p) => p.id === id);
+      const fallback = DEFAULT_CERT_DOCS[i];
+      if (item && item.image) {
+        return { src: item.image, label: item.name || fallback.label };
+      }
+      return fallback;
+    });
+  }, [rawProducts]);
+
+  const heroSlides = useMemo(() => {
+    return HERO_IDS.map((id, i) => {
+      const item = rawProducts.find((p) => p.id === id);
+      const fallback = DEFAULT_HERO_FALLBACK[i];
+      if (item && item.image) {
+        return {
+          image: item.image,
+          title: item.name || fallback?.title || "",
+          subtitle: item.unit || fallback?.subtitle || "",
+        };
+      }
+      return fallback;
+    }).filter((s): s is { image: string; title: string; subtitle: string } => s !== null);
+  }, [rawProducts]);
   const [activeCat, setActiveCat] = useState("all");
   const [query, setQuery] = useState("");
   const [cart, setCart] = useState<Record<string, number>>({});
@@ -291,7 +328,7 @@ export default function IndexPage() {
       </header>
 
       {/* Üst kayan görsel */}
-      <HeroSlider />
+      <HeroSlider slides={heroSlides} />
 
       {/* Body layout */}
       <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-8 px-6 py-8 lg:grid-cols-[220px_minmax(0,1fr)] lg:px-10">
@@ -358,7 +395,7 @@ export default function IndexPage() {
                 {filtered.length} ürün listeleniyor
               </span>
             </div>
-            <CertifiedProductBox media={promoMedia} onOpen={() => setCertModalOpen(true)} />
+            <CertifiedProductBox media={promoMedia} title={promoTitle} showCerts={showCerts} onOpen={() => setCertModalOpen(true)} />
           </div>
 
           <div className="mb-6 flex gap-2 overflow-x-auto pb-2">
@@ -668,7 +705,7 @@ export default function IndexPage() {
         </aside>
       </div>
 
-      <CertModal open={certModalOpen} onClose={() => setCertModalOpen(false)} />
+      <CertModal open={certModalOpen} onClose={() => setCertModalOpen(false)} docs={certDocs} />
 
       <CheckoutModal
         open={checkoutOpen}

@@ -9,10 +9,14 @@ import {
   deleteProduct,
   uploadProductImage,
   notifyProductsUpdated,
+  PROMO_ID,
+  HERO_IDS,
+  CERT_IDS,
   type Product,
 } from "@/lib/products";
 
-const PROMO_ID = "__promo__";
+const HERO_LABELS = ["1. Görsel", "2. Görsel", "3. Görsel", "4. Görsel (opsiyonel)", "5. Görsel (opsiyonel)"];
+const CERT_LABELS = ["1. Belge", "2. Belge", "3. Belge", "4. Belge", "5. Belge"];
 
 const AUTH_KEY = "aryom_admin_authed_v1";
 
@@ -126,19 +130,30 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   // ---- Tanıtım Kutusu (Ana sayfa sağ üstteki foto/video kutusu) ----
   const promoDraft = drafts.find((d) => d.id === PROMO_ID);
   const promoType: "image" | "video" = promoDraft?.category === "promo-video" ? "video" : "image";
+  // showCerts: promoDraft henüz yoksa (ilk kurulum) varsayılan olarak AÇIK kabul edilir.
+  const promoShowCerts = promoDraft ? promoDraft.price !== 0 : true;
 
-  const setPromoType = (type: "image" | "video") => {
+  const ensurePromoDraft = (patch: Partial<Draft> = {}) => {
     setDrafts((d) => {
       const exists = d.some((p) => p.id === PROMO_ID);
-      const category = type === "video" ? "promo-video" : "promo-image";
-      if (exists) {
-        return d.map((p) => (p.id === PROMO_ID ? { ...p, category } : p));
-      }
+      if (exists) return d.map((p) => (p.id === PROMO_ID ? { ...p, ...patch } : p));
       return [
         ...d,
-        { id: PROMO_ID, name: "Tanıtım Medyası", category, price: 0, unit: "-", emoji: "🎬" },
+        { id: PROMO_ID, name: "Battalbey Çiğ Köfte", category: "promo-image", price: 1, unit: "-", emoji: "🎬", ...patch },
       ];
     });
+  };
+
+  const setPromoType = (type: "image" | "video") => {
+    ensurePromoDraft({ category: type === "video" ? "promo-video" : "promo-image" });
+  };
+
+  const setPromoTitle = (name: string) => {
+    ensurePromoDraft({ name });
+  };
+
+  const setPromoShowCerts = (show: boolean) => {
+    ensurePromoDraft({ price: show ? 1 : 0 });
   };
 
   const handlePromoFile = async (file: File) => {
@@ -150,17 +165,57 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
       setErrorMsg("Dosya yüklenemedi. Lütfen tekrar deneyin.");
       return;
     }
+    ensurePromoDraft({ category: detectedType === "video" ? "promo-video" : "promo-image", image: url });
+  };
+
+  // ---- Belgeler (Tanıtım Kutusu'ndaki "Belgeleri gör" penceresinde çıkan sertifikalar) ----
+  const getCertDraft = (id: string) => drafts.find((d) => d.id === id);
+
+  const updateCertField = (id: string, patch: Partial<Draft>) => {
     setDrafts((d) => {
-      const exists = d.some((p) => p.id === PROMO_ID);
-      const category = detectedType === "video" ? "promo-video" : "promo-image";
-      if (exists) {
-        return d.map((p) => (p.id === PROMO_ID ? { ...p, category, image: url } : p));
-      }
+      const exists = d.some((p) => p.id === id);
+      if (exists) return d.map((p) => (p.id === id ? { ...p, ...patch } : p));
       return [
         ...d,
-        { id: PROMO_ID, name: "Tanıtım Medyası", category, price: 0, unit: "-", emoji: "🎬", image: url },
+        { id, name: "", category: "cert", price: 0, unit: "", emoji: "📄", ...patch },
       ];
     });
+  };
+
+  const handleCertFile = async (id: string, file: File) => {
+    setUploadingId(id);
+    const url = await uploadProductImage(id, file);
+    setUploadingId(null);
+    if (!url) {
+      setErrorMsg("Belge yüklenemedi. Lütfen tekrar deneyin.");
+      return;
+    }
+    updateCertField(id, { image: url });
+  };
+
+  // ---- Üst Banner (Ana sayfanın en üstünde kayan 3 görsel) ----
+  const getHeroDraft = (id: string) => drafts.find((d) => d.id === id);
+
+  const updateHeroField = (id: string, patch: Partial<Draft>) => {
+    setDrafts((d) => {
+      const exists = d.some((p) => p.id === id);
+      if (exists) return d.map((p) => (p.id === id ? { ...p, ...patch } : p));
+      return [
+        ...d,
+        { id, name: "", category: "hero", price: 0, unit: "", emoji: "🖼️", ...patch },
+      ];
+    });
+  };
+
+  const handleHeroFile = async (id: string, file: File) => {
+    setUploadingId(id);
+    const url = await uploadProductImage(id, file);
+    setUploadingId(null);
+    if (!url) {
+      setErrorMsg("Fotoğraf yüklenemedi. Lütfen tekrar deneyin.");
+      return;
+    }
+    updateHeroField(id, { image: url });
   };
 
   const addProduct = (category: string = "firsat") => {
@@ -249,6 +304,71 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
       </header>
 
       <main className="mx-auto max-w-[1400px] px-6 py-8 lg:px-10">
+        <div className="mb-8 overflow-hidden rounded-2xl border border-border bg-card shadow-[0_10px_40px_-20px_rgba(0,0,0,0.15)]">
+          <div className="flex items-center justify-between border-b border-border bg-secondary/30 px-5 py-4">
+            <div className="flex items-center gap-3">
+              <span className="text-lg">🖼️</span>
+              <div>
+                <h2 className="font-display text-xl text-foreground">Üst Banner (Kayan Görseller)</h2>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                  Ana sayfanın en üstünde dönen fotoğraflar · 2-5 arası görsel kullanabilirsiniz
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-4 px-5 py-5 sm:grid-cols-2 lg:grid-cols-3">
+            {HERO_IDS.map((id, i) => {
+              const draft = getHeroDraft(id);
+              return (
+                <div key={id} className="rounded-xl border border-border bg-background p-3">
+                  <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    {HERO_LABELS[i]}
+                  </div>
+                  <label className="group relative flex h-28 w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg border border-border bg-secondary transition hover:border-gold/60">
+                    {uploadingId === id ? (
+                      <span className="text-[11px] text-muted-foreground">Yükleniyor...</span>
+                    ) : draft?.image ? (
+                      <img src={draft.image} alt={HERO_LABELS[i]} className="h-full w-full object-cover" />
+                    ) : (
+                      <span className="text-[11px] text-muted-foreground">
+                        {i < 3 ? "Varsayılan görsel kullanılıyor" : "Henüz görsel yok"}
+                      </span>
+                    )}
+                    <div className="absolute inset-0 hidden items-center justify-center bg-foreground/60 text-background group-hover:flex">
+                      <ImagePlus className="h-5 w-5" />
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) handleHeroFile(id, f);
+                      }}
+                    />
+                  </label>
+                  <input
+                    value={draft?.name || ""}
+                    onChange={(e) => updateHeroField(id, { name: e.target.value })}
+                    placeholder="Başlık (opsiyonel)"
+                    className="mt-2 w-full rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs text-foreground outline-none focus:border-gold/60"
+                  />
+                  <input
+                    value={draft?.unit || ""}
+                    onChange={(e) => updateHeroField(id, { unit: e.target.value })}
+                    placeholder="Alt yazı (opsiyonel)"
+                    className="mt-1.5 w-full rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs text-foreground outline-none focus:border-gold/60"
+                  />
+                </div>
+              );
+            })}
+          </div>
+          <div className="border-t border-border bg-secondary/20 px-5 py-3 text-[11px] text-muted-foreground">
+            Değişikliklerin ana sayfada görünmesi için en alttaki "Kaydet" butonuna basmayı unutmayın.
+          </div>
+        </div>
+
         <div className="mb-8 overflow-hidden rounded-2xl border border-gold/50 bg-card shadow-[0_10px_40px_-20px_rgba(191,155,48,0.35)]">
           <div className="flex items-center justify-between border-b border-gold/30 bg-gold/5 px-5 py-4">
             <div className="flex items-center gap-3">
@@ -283,6 +403,19 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
             </div>
 
             <div className="flex-1 space-y-4">
+              {/* Urun adi */}
+              <div>
+                <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                  Ürün Adı (kutunun altında görünür)
+                </div>
+                <input
+                  value={promoDraft?.name ?? "Battalbey Çiğ Köfte"}
+                  onChange={(e) => setPromoTitle(e.target.value)}
+                  placeholder="Örn. Türk Kahvesi Makinesi"
+                  className="w-full max-w-xs rounded-lg border border-border bg-background px-3 py-2 text-xs text-foreground outline-none focus:border-gold/60"
+                />
+              </div>
+
               {/* Foto / Video secimi */}
               <div>
                 <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">İçerik Türü</div>
@@ -327,7 +460,83 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                   "Kaydet" butonuna basmayı unutmayın.
                 </p>
               </div>
+
+              {/* Belgeleri goster/gizle */}
+              <label className="flex cursor-pointer items-center gap-2.5 rounded-lg border border-border bg-background px-3.5 py-2.5">
+                <input
+                  type="checkbox"
+                  checked={promoShowCerts}
+                  onChange={(e) => setPromoShowCerts(e.target.checked)}
+                  className="h-4 w-4 accent-gold"
+                />
+                <span className="text-xs text-foreground">
+                  Belge/sertifika rozetlerini ve "Belgeleri gör" penceresini göster
+                </span>
+              </label>
+              <p className="text-[11px] text-muted-foreground">
+                Farklı bir ürüne (örn. kahve makinesi) geçerken, o ürünle ilgisi olmayan gıda sertifikalarının
+                görünmesini istemiyorsan bu kutuyu kapatabilirsin.
+              </p>
             </div>
+          </div>
+        </div>
+
+        <div className="mb-8 overflow-hidden rounded-2xl border border-border bg-card shadow-[0_10px_40px_-20px_rgba(0,0,0,0.15)]">
+          <div className="flex items-center justify-between border-b border-border bg-secondary/30 px-5 py-4">
+            <div className="flex items-center gap-3">
+              <span className="text-lg">📄</span>
+              <div>
+                <h2 className="font-display text-xl text-foreground">Belgeler (Sertifikalar)</h2>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                  "Belgeleri gör" penceresinde çıkan belgeler · her birini ayrı ayrı değiştirebilirsin
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-4 px-5 py-5 sm:grid-cols-2 lg:grid-cols-3">
+            {CERT_IDS.map((id, i) => {
+              const draft = getCertDraft(id);
+              return (
+                <div key={id} className="rounded-xl border border-border bg-background p-3">
+                  <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    {CERT_LABELS[i]}
+                  </div>
+                  <label className="group relative flex h-28 w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg border border-border bg-secondary transition hover:border-gold/60">
+                    {uploadingId === id ? (
+                      <span className="text-[11px] text-muted-foreground">Yükleniyor...</span>
+                    ) : draft?.image ? (
+                      <img src={draft.image} alt={CERT_LABELS[i]} className="h-full w-full object-cover" />
+                    ) : (
+                      <span className="px-2 text-center text-[11px] text-muted-foreground">
+                        Varsayılan belge kullanılıyor
+                      </span>
+                    )}
+                    <div className="absolute inset-0 hidden items-center justify-center bg-foreground/60 text-background group-hover:flex">
+                      <ImagePlus className="h-5 w-5" />
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) handleCertFile(id, f);
+                      }}
+                    />
+                  </label>
+                  <input
+                    value={draft?.name || ""}
+                    onChange={(e) => updateCertField(id, { name: e.target.value })}
+                    placeholder="Belge adı (opsiyonel)"
+                    className="mt-2 w-full rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs text-foreground outline-none focus:border-gold/60"
+                  />
+                </div>
+              );
+            })}
+          </div>
+          <div className="border-t border-border bg-secondary/20 px-5 py-3 text-[11px] text-muted-foreground">
+            Değişikliklerin görünmesi için en alttaki "Kaydet" butonuna basmayı unutmayın.
           </div>
         </div>
 
