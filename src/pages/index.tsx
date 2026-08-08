@@ -599,7 +599,7 @@ function CheckoutModal({
     if (!canSubmit) return;
     const text = encodeURIComponent(buildMessage());
     const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
-    window.open(url, "_blank", "noopener,noreferrer");
+window.location.href = url;
     onSuccess();
   };
 
