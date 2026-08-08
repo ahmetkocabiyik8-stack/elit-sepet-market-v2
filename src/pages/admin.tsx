@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "wouter";
-import { ArrowLeft, Save, Plus, Trash2, Upload, Lock, LogOut, ImagePlus } from "lucide-react";
+import { ArrowLeft, Save, Plus, Trash2, Upload, Lock, LogOut, ImagePlus, Image as ImageIcon, Video as VideoIcon } from "lucide-react";
 import {
   ADMIN_PIN,
   categories,
@@ -11,6 +11,8 @@ import {
   notifyProductsUpdated,
   type Product,
 } from "@/lib/products";
+
+const PROMO_ID = "__promo__";
 
 const AUTH_KEY = "aryom_admin_authed_v1";
 
@@ -121,6 +123,46 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     setUploadingId(null);
   };
 
+  // ---- Tanıtım Kutusu (Ana sayfa sağ üstteki foto/video kutusu) ----
+  const promoDraft = drafts.find((d) => d.id === PROMO_ID);
+  const promoType: "image" | "video" = promoDraft?.category === "promo-video" ? "video" : "image";
+
+  const setPromoType = (type: "image" | "video") => {
+    setDrafts((d) => {
+      const exists = d.some((p) => p.id === PROMO_ID);
+      const category = type === "video" ? "promo-video" : "promo-image";
+      if (exists) {
+        return d.map((p) => (p.id === PROMO_ID ? { ...p, category } : p));
+      }
+      return [
+        ...d,
+        { id: PROMO_ID, name: "Tanıtım Medyası", category, price: 0, unit: "-", emoji: "🎬" },
+      ];
+    });
+  };
+
+  const handlePromoFile = async (file: File) => {
+    const detectedType: "image" | "video" = file.type.startsWith("video") ? "video" : "image";
+    setUploadingId(PROMO_ID);
+    const url = await uploadProductImage(PROMO_ID, file);
+    setUploadingId(null);
+    if (!url) {
+      setErrorMsg("Dosya yüklenemedi. Lütfen tekrar deneyin.");
+      return;
+    }
+    setDrafts((d) => {
+      const exists = d.some((p) => p.id === PROMO_ID);
+      const category = detectedType === "video" ? "promo-video" : "promo-image";
+      if (exists) {
+        return d.map((p) => (p.id === PROMO_ID ? { ...p, category, image: url } : p));
+      }
+      return [
+        ...d,
+        { id: PROMO_ID, name: "Tanıtım Medyası", category, price: 0, unit: "-", emoji: "🎬", image: url },
+      ];
+    });
+  };
+
   const addProduct = (category: string = "firsat") => {
     const id = `custom-${Date.now()}`;
     const emoji = category === "firsat" ? "⭐" : "🛒";
@@ -207,6 +249,88 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
       </header>
 
       <main className="mx-auto max-w-[1400px] px-6 py-8 lg:px-10">
+        <div className="mb-8 overflow-hidden rounded-2xl border border-gold/50 bg-card shadow-[0_10px_40px_-20px_rgba(191,155,48,0.35)]">
+          <div className="flex items-center justify-between border-b border-gold/30 bg-gold/5 px-5 py-4">
+            <div className="flex items-center gap-3">
+              <span className="text-lg">🎬</span>
+              <div>
+                <h2 className="font-display text-xl text-gold">Tanıtım Kutusu</h2>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                  Ana sayfada sağ üstte görünen foto/video kutusu
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-5 px-5 py-5 sm:flex-row sm:items-start">
+            {/* Önizleme */}
+            <div className="relative h-40 w-40 shrink-0 overflow-hidden rounded-xl border border-border bg-secondary">
+              {uploadingId === PROMO_ID ? (
+                <div className="grid h-full w-full place-items-center text-[11px] text-muted-foreground">
+                  Yükleniyor...
+                </div>
+              ) : promoDraft?.image ? (
+                promoType === "video" ? (
+                  <video src={promoDraft.image} className="h-full w-full object-cover" muted loop autoPlay playsInline />
+                ) : (
+                  <img src={promoDraft.image} alt="Tanıtım" className="h-full w-full object-contain p-1" />
+                )
+              ) : (
+                <div className="grid h-full w-full place-items-center text-[11px] text-muted-foreground">
+                  Henüz medya yok
+                </div>
+              )}
+            </div>
+
+            <div className="flex-1 space-y-4">
+              {/* Foto / Video secimi */}
+              <div>
+                <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">İçerik Türü</div>
+                <div className="inline-flex rounded-full border border-border bg-background p-1">
+                  <button
+                    onClick={() => setPromoType("image")}
+                    className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-medium transition ${
+                      promoType === "image" ? "bg-gold text-gold-foreground" : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <ImageIcon className="h-3.5 w-3.5" /> Fotoğraf
+                  </button>
+                  <button
+                    onClick={() => setPromoType("video")}
+                    className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-medium transition ${
+                      promoType === "video" ? "bg-gold text-gold-foreground" : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <VideoIcon className="h-3.5 w-3.5" /> Video
+                  </button>
+                </div>
+              </div>
+
+              {/* Dosya yukleme */}
+              <div>
+                <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Dosya Yükle</div>
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-border bg-background px-4 py-2.5 text-xs font-medium text-foreground transition hover:border-gold/60 hover:bg-gold/10">
+                  <Upload className="h-3.5 w-3.5" />
+                  {promoType === "video" ? "Video Seç" : "Fotoğraf Seç"}
+                  <input
+                    type="file"
+                    accept={promoType === "video" ? "video/*" : "image/*"}
+                    className="hidden"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) handlePromoFile(f);
+                    }}
+                  />
+                </label>
+                <p className="mt-2 text-[11px] text-muted-foreground">
+                  Video dosyaları biraz zaman alabilir, lütfen yükleme bitene kadar bekleyin. Yükledikten sonra en alttaki
+                  "Kaydet" butonuna basmayı unutmayın.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="font-display text-3xl text-foreground">Ürün Yönetimi</h1>

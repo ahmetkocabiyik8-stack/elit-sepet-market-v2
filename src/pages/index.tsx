@@ -1,19 +1,173 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
-import { Search, Plus, Minus, ShoppingBag, Trash2, X, MessageCircle, Phone, User, KeyRound, CreditCard, Wallet, Lock, Heart } from "lucide-react";
+import { Search, Plus, Minus, ShoppingBag, Trash2, X, MessageCircle, Phone, User, KeyRound, CreditCard, Wallet, Lock, Heart, Play, ShieldCheck } from "lucide-react";
 import { categories, useProducts, effectivePrice, discountPercent, isOutOfStock, type Product } from "@/lib/products";
 import aryomKoruImage from "@/assets/aryom-koru.jpg";
+import heroSut from "@/assets/hero-sut.jpg";
+import heroKasa from "@/assets/hero-kasa.jpg";
+import heroCips from "@/assets/hero-cips.jpg";
+import cigKofteImage from "@/assets/cig-kofte.jpg";
+import certMarka from "@/assets/certs/marka-tescil.jpg";
+import certIso from "@/assets/certs/iso-22000.jpg";
+import certHijyen from "@/assets/certs/hijyen-belgesi.jpg";
+import certHelal from "@/assets/certs/helal-belgesi.jpg";
+import certTavsiye from "@/assets/certs/tavsiye-sertifikasi.jpg";
 
 const WHATSAPP_NUMBER = "905324556076";
 const MARKET_NAME = "Aryom Market";
 
+// ---- Üst kayan görsel (hero slider) ----
+// İleride video eklemek için: her slaytta "video" alanına video dosyasının yolunu yazman yeterli
+// (örn. video: "@/assets/cig-kofte-video.mp4" gibi bir import). Video tanımlıysa resim yerine video oynar.
+const HERO_SLIDES: { image: string; title: string; subtitle: string }[] = [
+  { image: heroSut, title: "Taze Süt & Süt Ürünleri", subtitle: "Her gün taze, kapınıza kadar" },
+  { image: heroKasa, title: "Hızlı ve Güler Yüzlü Hizmet", subtitle: "Siparişiniz dakikalar içinde hazır" },
+  { image: heroCips, title: "Geniş Atıştırmalık Reyonu", subtitle: "Aradığınız her marka burada" },
+];
+
+function HeroSlider() {
+  const [current, setCurrent] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setCurrent((c) => (c + 1) % HERO_SLIDES.length), 3500);
+    return () => clearInterval(t);
+  }, []);
+  return (
+    <div className="relative mx-auto mt-4 h-[190px] w-full max-w-[1600px] overflow-hidden rounded-2xl sm:h-[240px] lg:h-[280px]">
+      {HERO_SLIDES.map((s, i) => (
+        <div
+          key={i}
+          className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${i === current ? "opacity-100" : "opacity-0"}`}
+        >
+          <img src={s.image} alt={s.title} className="h-full w-full object-cover brightness-[0.82]" />
+          <div className="absolute bottom-5 left-6 text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]">
+            <div className="font-display text-xl sm:text-2xl font-bold">{s.title}</div>
+            <div className="mt-1 text-xs sm:text-sm opacity-95">{s.subtitle}</div>
+          </div>
+        </div>
+      ))}
+      <div className="absolute bottom-4 right-5 flex gap-2">
+        {HERO_SLIDES.map((_, i) => (
+          <span key={i} className={`h-2 w-2 rounded-full transition-colors ${i === current ? "bg-white" : "bg-white/50"}`} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ---- Sertifikalı ürün tanıtım kutusu (sağ üstte, "X ürün listeleniyor" hizasında) ----
+// Bu kutunun foto/video içeriği artık Yönetici Paneli'nden (Tanıtım Kutusu bölümü) yönetiliyor.
+// Panelden hiçbir şey yüklenmemişse aşağıdaki varsayılan fotoğraf gösterilir.
+type PromoMedia = { type: "image"; src: string } | { type: "video"; src: string };
+const DEFAULT_PROMO_MEDIA: PromoMedia = { type: "image", src: cigKofteImage };
+
+const CERT_DOCS = [
+  { src: certMarka, label: "Marka Tescil Belgesi" },
+  { src: certIso, label: "ISO 22000:2018" },
+  { src: certHijyen, label: "Hijyen Belgesi" },
+  { src: certHelal, label: "Helal Belgesi" },
+  { src: certTavsiye, label: "Tüketici Tavsiye Sertifikası" },
+];
+
+function CertifiedProductBox({ media, onOpen }: { media: PromoMedia; onOpen: () => void }) {
+  return (
+    <button
+      onClick={onOpen}
+      className="group relative h-[220px] w-[220px] shrink-0 overflow-hidden rounded-2xl border border-border bg-card text-left shadow-[var(--shadow-soft)] transition hover:-translate-y-0.5 sm:h-[250px] sm:w-[250px]"
+    >
+      <span className="absolute left-2.5 top-2.5 z-10 rounded-full bg-[var(--orange)] px-2.5 py-1 text-[10px] font-bold text-white shadow-[var(--shadow-orange)]">
+        YENİ ÜRÜN
+      </span>
+      {media.type === "video" ? (
+        <video
+          src={media.src}
+          className="h-[62%] w-full object-cover bg-black"
+          autoPlay
+          muted
+          loop
+          playsInline
+        />
+      ) : (
+        <img src={media.src} alt="Battalbey Çiğ Köfte" className="h-[62%] w-full object-contain bg-white p-2" loading="lazy" />
+      )}
+      <div className="px-3.5 pb-3 pt-2">
+        <h4 className="font-display text-[13.5px] leading-tight text-foreground">Battalbey Çiğ Köfte</h4>
+        <div className="mt-1.5 flex flex-wrap gap-1">
+          <span className="rounded-md bg-blue-500/10 px-1.5 py-0.5 text-[8.5px] font-bold text-blue-600">✓ ISO 22000</span>
+          <span className="rounded-md bg-emerald-500/10 px-1.5 py-0.5 text-[8.5px] font-bold text-emerald-600">✓ Helal</span>
+          <span className="rounded-md bg-amber-500/10 px-1.5 py-0.5 text-[8.5px] font-bold text-amber-600">✓ Hijyen</span>
+        </div>
+      </div>
+      <span className="absolute bottom-2.5 right-2.5 rounded-full bg-black/55 px-2 py-1 text-[8.5px] font-medium text-white">
+        Belgeleri gör →
+      </span>
+    </button>
+  );
+}
+
+function CertModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [lightbox, setLightbox] = useState<string | null>(null);
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-5" onClick={onClose}>
+      <div
+        className="max-h-[85vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-card p-6"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="mb-4 flex items-start justify-between">
+          <div>
+            <div className="flex items-center gap-2 font-display text-lg text-foreground">
+              <ShieldCheck className="h-5 w-5 text-emerald-600" /> Battalbey Çiğ Köfte — Resmi Belgeler
+            </div>
+            <div className="mt-1 text-xs text-muted-foreground">Büyütmek için görsele tıklayın.</div>
+          </div>
+          <button onClick={onClose} className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-secondary text-foreground">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {CERT_DOCS.map((c) => (
+            <button
+              key={c.label}
+              onClick={() => setLightbox(c.src)}
+              className="overflow-hidden rounded-xl border border-border text-left"
+            >
+              <img src={c.src} alt={c.label} className="h-32 w-full object-cover" loading="lazy" />
+              <div className="px-2 py-2 text-center text-[11px] font-semibold text-foreground">{c.label}</div>
+            </button>
+          ))}
+        </div>
+      </div>
+      {lightbox && (
+        <div
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-black/90 p-5"
+          onClick={(e) => {
+            e.stopPropagation();
+            setLightbox(null);
+          }}
+        >
+          <img src={lightbox} alt="Belge" className="max-h-[90vh] max-w-full rounded-lg object-contain" />
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function IndexPage() {
-  const products = useProducts();
+  const rawProducts = useProducts();
+  const products = useMemo(() => rawProducts.filter((p) => p.id !== "__promo__"), [rawProducts]);
+  const promoItem = useMemo(() => rawProducts.find((p) => p.id === "__promo__"), [rawProducts]);
+  const promoMedia: PromoMedia = useMemo(() => {
+    if (promoItem && promoItem.image) {
+      return { type: promoItem.category === "promo-video" ? "video" : "image", src: promoItem.image };
+    }
+    return DEFAULT_PROMO_MEDIA;
+  }, [promoItem]);
   const [activeCat, setActiveCat] = useState("all");
   const [query, setQuery] = useState("");
   const [cart, setCart] = useState<Record<string, number>>({});
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+  const [certModalOpen, setCertModalOpen] = useState(false);
 
   const [favorites, setFavorites] = useState<Set<string>>(() => {
     try { return new Set<string>(JSON.parse(localStorage.getItem("aryom_favorites_v1") || "[]")); }
@@ -59,7 +213,16 @@ export default function IndexPage() {
   const total = cartItems.reduce((s, i) => s + effectivePrice(i) * i.qty, 0);
   const itemCount = cartItems.reduce((s, i) => s + i.qty, 0);
 
-  const add = (id: string) => setCart((c) => ({ ...c, [id]: (c[id] || 0) + 1 }));
+  const add = (id: string) =>
+    setCart((c) => {
+      const product = products.find((p) => p.id === id);
+      const current = c[id] || 0;
+      // Stok tanımlıysa (bir sayıysa), sepete o stoktan fazla eklenemez.
+      if (product && typeof product.stock === "number" && current >= product.stock) {
+        return c;
+      }
+      return { ...c, [id]: current + 1 };
+    });
   const dec = (id: string) =>
     setCart((c) => {
       const n = (c[id] || 0) - 1;
@@ -127,6 +290,9 @@ export default function IndexPage() {
         </div>
       </header>
 
+      {/* Üst kayan görsel */}
+      <HeroSlider />
+
       {/* Body layout */}
       <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-8 px-6 py-8 lg:grid-cols-[220px_minmax(0,1fr)] lg:px-10">
         {/* Sidebar categories */}
@@ -177,7 +343,7 @@ export default function IndexPage() {
 
         {/* Products grid */}
         <main>
-          <div className="mb-6 flex items-end justify-between gap-4">
+          <div className="mb-6 flex items-start justify-between gap-4">
             <div>
               <div className="text-[11px] uppercase tracking-[0.22em] text-gold">
                 Aryom Market · Rezidans 168
@@ -188,10 +354,11 @@ export default function IndexPage() {
               <p className="mt-1.5 text-sm text-muted-foreground">
                 Sakinlerimize özel, kapınıza teslim seçkin ürünler.
               </p>
+              <span className="mt-2 block text-sm text-muted-foreground">
+                {filtered.length} ürün listeleniyor
+              </span>
             </div>
-            <span className="shrink-0 text-sm text-muted-foreground">
-              {filtered.length} ürün listeleniyor
-            </span>
+            <CertifiedProductBox media={promoMedia} onOpen={() => setCertModalOpen(true)} />
           </div>
 
           <div className="mb-6 flex gap-2 overflow-x-auto pb-2">
@@ -263,6 +430,8 @@ export default function IndexPage() {
                 const isFirsat = p.category === "firsat";
                 const isFav = favorites.has(p.id);
                 const pct = discountPercent(p);
+                const stockLimited = typeof p.stock === "number";
+                const reachedLimit = stockLimited && qty >= (p.stock as number);
                 return (
                   <article
                     key={p.id}
@@ -330,6 +499,15 @@ export default function IndexPage() {
                           <div className="text-lg font-bold leading-none tracking-tight text-gold">₺{p.price.toFixed(2)}</div>
                         )}
                         <div className="mt-0.5 text-[10px] text-muted-foreground">/ {p.unit}</div>
+                        {stockLimited && (
+                          reachedLimit ? (
+                            <div className="mt-0.5 text-[10px] font-bold text-red-600">Tükendi</div>
+                          ) : (
+                            <div className="mt-0.5 text-[10px] font-medium text-muted-foreground">
+                              Stokta {Math.max((p.stock as number) - qty, 0)} adet
+                            </div>
+                          )
+                        )}
                       </div>
                       {qty === 0 ? (
                         <button
@@ -345,7 +523,11 @@ export default function IndexPage() {
                             <Minus className="h-3 w-3" strokeWidth={2.5} />
                           </button>
                           <span className="min-w-[22px] text-center text-sm font-bold text-foreground">{qty}</span>
-                          <button onClick={() => add(p.id)} className="grid h-7 w-7 place-items-center rounded-full text-gold transition hover:bg-gold hover:text-gold-foreground">
+                          <button
+                            onClick={() => add(p.id)}
+                            disabled={reachedLimit}
+                            className="grid h-7 w-7 place-items-center rounded-full text-gold transition hover:bg-gold hover:text-gold-foreground disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-gold"
+                          >
                             <Plus className="h-3 w-3" strokeWidth={2.5} />
                           </button>
                         </div>
@@ -485,6 +667,8 @@ export default function IndexPage() {
           )}
         </aside>
       </div>
+
+      <CertModal open={certModalOpen} onClose={() => setCertModalOpen(false)} />
 
       <CheckoutModal
         open={checkoutOpen}
