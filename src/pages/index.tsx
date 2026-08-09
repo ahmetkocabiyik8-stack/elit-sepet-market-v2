@@ -76,7 +76,7 @@ function CertifiedProductBox({ media, title, showCerts, onOpen }: { media: Promo
   return (
     <Wrapper
       onClick={showCerts ? onOpen : undefined}
-      className={`group relative h-[248px] w-[220px] shrink-0 overflow-hidden rounded-2xl border border-border bg-card text-left shadow-[var(--shadow-soft)] transition sm:h-[250px] sm:w-[250px] ${showCerts ? "hover:-translate-y-0.5" : ""}`}
+      className={`group relative h-[276px] w-[220px] shrink-0 overflow-hidden rounded-2xl border border-border bg-card text-left shadow-[var(--shadow-soft)] transition sm:h-[276px] sm:w-[250px] ${showCerts ? "hover:-translate-y-0.5" : ""}`}
     >
       <span className="absolute left-2.5 top-2.5 z-10 rounded-full bg-[var(--orange)] px-2.5 py-1 text-[10px] font-bold text-white shadow-[var(--shadow-orange)]">
         YENİ ÜRÜN
@@ -84,14 +84,14 @@ function CertifiedProductBox({ media, title, showCerts, onOpen }: { media: Promo
       {media.type === "video" ? (
         <video
           src={media.src}
-          className="h-[56%] w-full object-cover bg-black sm:h-[62%]"
+          className="h-[62%] w-full object-cover bg-black"
           autoPlay
           muted
           loop
           playsInline
         />
       ) : (
-        <img src={media.src} alt="Ürün" className="h-[56%] w-full object-contain bg-white p-2 sm:h-[62%]" loading="lazy" />
+        <img src={media.src} alt="Ürün" className="h-[62%] w-full object-contain bg-white p-2" loading="lazy" />
       )}
       <div className="px-3.5 pb-3 pt-2">
         <h4 className="font-display text-[13.5px] leading-tight text-foreground">{title}</h4>
