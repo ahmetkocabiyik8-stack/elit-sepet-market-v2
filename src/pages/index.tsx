@@ -373,15 +373,20 @@ export default function IndexPage() {
             <button
               onClick={() => setCartOpen(true)}
               aria-label="Sepeti aç"
-              className="relative hidden shrink-0 items-center gap-2 rounded-full border border-gold bg-gold px-4 py-2.5 text-sm font-semibold text-gold-foreground shadow-[var(--shadow-green)] transition hover:opacity-90 lg:order-3 lg:flex lg:px-5 lg:py-3"
+              className="relative hidden shrink-0 flex-col items-start gap-0.5 rounded-2xl border border-border bg-card px-4 py-2 shadow-[var(--shadow-card)] transition hover:shadow-[var(--shadow-soft)] lg:order-3 lg:flex lg:px-5 lg:py-2.5"
             >
-              <ShoppingBag className="h-5 w-5 text-gold-foreground" strokeWidth={1.8} />
-              <span className="hidden sm:inline">Sepetim</span>
-              <span className="rounded-full bg-white/25 px-2 py-0.5 text-xs font-bold text-gold-foreground">
-                {itemCount}
+              <span className="flex items-center gap-2">
+                <span className="relative">
+                  <ShoppingBag className="h-5 w-5 text-foreground" strokeWidth={1.8} />
+                  {itemCount > 0 && (
+                    <span className="absolute -right-1.5 -top-1.5 grid h-4 w-4 place-items-center rounded-full bg-[var(--orange)] text-[9px] font-bold text-white">
+                      {itemCount}
+                    </span>
+                  )}
+                </span>
+                <span className="text-sm font-semibold text-foreground">Sepetim</span>
               </span>
-              <span className="hidden md:inline text-gold-foreground/80">·</span>
-              <span className="hidden md:inline font-semibold">₺{total.toFixed(2)}</span>
+              <span className="text-sm font-bold text-[var(--orange)]">₺{total.toFixed(2)}</span>
             </button>
           </div>
 
@@ -458,15 +463,21 @@ export default function IndexPage() {
               <button
                 onClick={() => setCartOpen(true)}
                 aria-label="Sepeti aç"
-                className="relative inline-flex items-center gap-1.5 rounded-full border border-gold bg-gold px-3 py-1.5 text-xs font-semibold text-gold-foreground shadow-[var(--shadow-green)] transition hover:opacity-90 lg:hidden"
+                className="relative inline-flex flex-col items-start gap-0.5 rounded-2xl border border-border bg-card px-3.5 py-2 shadow-[var(--shadow-card)] transition hover:shadow-[var(--shadow-soft)] lg:hidden"
               >
-                <ShoppingBag className="h-3.5 w-3.5" strokeWidth={1.8} />
-                Sepetim
-                <span className="rounded-full bg-white/25 px-1.5 py-0.5 text-[10px] font-bold text-gold-foreground">
-                  {itemCount}
+                <span className="flex items-center gap-1.5">
+                  <span className="relative">
+                    <ShoppingBag className="h-4 w-4 text-foreground" strokeWidth={1.8} />
+                    {itemCount > 0 && (
+                      <span className="absolute -right-1.5 -top-1.5 grid h-3.5 w-3.5 place-items-center rounded-full bg-[var(--orange)] text-[8px] font-bold text-white">
+                        {itemCount}
+                      </span>
+                    )}
+                  </span>
+                  <span className="text-xs font-semibold text-foreground">Sepetim</span>
                 </span>
                 {itemCount > 0 && (
-                  <span className="ml-0.5 font-semibold">· ₺{total.toFixed(2)}</span>
+                  <span className="text-xs font-bold text-[var(--orange)]">₺{total.toFixed(2)}</span>
                 )}
               </button>
               <h1 className="mt-1.5 font-display text-3xl leading-tight text-foreground">
