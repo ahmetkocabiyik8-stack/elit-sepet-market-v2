@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
-import { Search, Plus, Minus, ShoppingBag, Trash2, X, MessageCircle, Phone, User, KeyRound, CreditCard, Wallet, Lock, Heart, Play, ShieldCheck } from "lucide-react";
+import { Search, Plus, Minus, ShoppingBag, Trash2, X, MessageCircle, Phone, User, KeyRound, CreditCard, Wallet, Lock, Heart, Play, ShieldCheck, Home, LayoutGrid } from "lucide-react";
 import { categories, useProducts, effectivePrice, discountPercent, isOutOfStock, PROMO_ID, HERO_IDS, CERT_IDS, RESERVED_IDS, type Product } from "@/lib/products";
 import aryomKoruImage from "@/assets/aryom-koru.jpg";
 import heroSut from "@/assets/hero-sut.jpg";
@@ -160,6 +160,64 @@ function CertModal({ open, onClose, docs }: { open: boolean; onClose: () => void
   );
 }
 
+// ---- Mobil alt navigasyon çubuğu (Anasayfa / Kategoriler / Favoriler / Sepetim) ----
+function BottomNav({
+  itemCount,
+  favCount,
+  activeCat,
+  onHome,
+  onCategories,
+  onFavorites,
+  onCart,
+}: {
+  itemCount: number;
+  favCount: number;
+  activeCat: string;
+  onHome: () => void;
+  onCategories: () => void;
+  onFavorites: () => void;
+  onCart: () => void;
+}) {
+  const items = [
+    { key: "home", label: "Anasayfa", icon: Home, onClick: onHome, active: false, badge: 0 },
+    { key: "cats", label: "Kategoriler", icon: LayoutGrid, onClick: onCategories, active: false, badge: 0 },
+    { key: "favs", label: "Favorilerim", icon: Heart, onClick: onFavorites, active: activeCat === "favs", badge: favCount },
+    { key: "cart", label: "Sepetim", icon: ShoppingBag, onClick: onCart, active: false, badge: itemCount },
+  ];
+  return (
+    <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 backdrop-blur-xl lg:hidden">
+      <div className="mx-auto flex max-w-[1600px] items-center justify-around px-2 py-1.5" style={{ paddingBottom: "calc(0.375rem + env(safe-area-inset-bottom))" }}>
+        {items.map((it) => {
+          const Icon = it.icon;
+          return (
+            <button
+              key={it.key}
+              onClick={it.onClick}
+              className={`flex flex-col items-center gap-1 rounded-xl px-4 py-1.5 text-[11px] font-medium transition-colors ${
+                it.active ? "text-gold" : "text-muted-foreground"
+              }`}
+            >
+              <span className="relative">
+                <Icon
+                  className="h-5 w-5"
+                  strokeWidth={it.active ? 2.2 : 1.8}
+                  fill={it.key === "favs" && it.active ? "currentColor" : "none"}
+                />
+                {it.badge > 0 && (
+                  <span className="absolute -right-2 -top-2 grid h-4 w-4 place-items-center rounded-full bg-[var(--orange)] text-[9px] font-bold text-white">
+                    {it.badge > 9 ? "9+" : it.badge}
+                  </span>
+                )}
+              </span>
+              {it.label}
+            </button>
+          );
+        })}
+      </div>
+    </nav>
+  );
+}
+
 export default function IndexPage() {
   const rawProducts = useProducts();
   const products = useMemo(() => rawProducts.filter((p) => !RESERVED_IDS.includes(p.id)), [rawProducts]);
@@ -276,7 +334,7 @@ export default function IndexPage() {
     });
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20 lg:pb-0">
       {/* Header */}
       <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur-xl">
         <div className="mx-auto flex max-w-[1600px] items-center gap-6 px-6 py-3 lg:px-10">
@@ -398,7 +456,7 @@ export default function IndexPage() {
             <CertifiedProductBox media={promoMedia} title={promoTitle} showCerts={showCerts} onOpen={() => setCertModalOpen(true)} />
           </div>
 
-          <div className="mb-6 flex gap-2 overflow-x-auto pb-2">
+          <div id="kategoriler-alani" className="mb-6 flex gap-2 overflow-x-auto pb-2 scroll-mt-24">
             {categories.map((c) => {
               const active = activeCat === c.id;
               const isFirsat = c.id === "firsat";
@@ -718,6 +776,24 @@ export default function IndexPage() {
           setCart({});
           setCheckoutOpen(false);
         }}
+      />
+
+      <BottomNav
+        itemCount={itemCount}
+        favCount={favorites.size}
+        activeCat={activeCat}
+        onHome={() => {
+          setActiveCat("all");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+        onCategories={() => {
+          document.getElementById("kategoriler-alani")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }}
+        onFavorites={() => {
+          setActiveCat("favs");
+          document.getElementById("kategoriler-alani")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }}
+        onCart={() => setCartOpen(true)}
       />
 
       <footer className="mx-auto max-w-[1600px] px-6 py-10 text-center text-xs text-muted-foreground lg:px-10">
