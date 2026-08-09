@@ -498,7 +498,7 @@ export default function IndexPage() {
           {activeCat === "all" && (
             <button
               onClick={() => setActiveCat("firsat")}
-              className="mb-6 flex w-full items-center justify-between overflow-hidden rounded-xl border-l-4 border-l-[var(--orange)] border border-border bg-card px-6 py-5 text-left transition hover:shadow-[var(--shadow-soft)]"
+              className="mb-6 hidden w-full items-center justify-between overflow-hidden rounded-xl border-l-4 border-l-[var(--orange)] border border-border bg-card px-6 py-5 text-left transition hover:shadow-[var(--shadow-soft)] lg:flex"
             >
               <div>
                 <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--orange)]">
