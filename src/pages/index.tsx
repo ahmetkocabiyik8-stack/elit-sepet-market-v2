@@ -596,16 +596,18 @@ export default function IndexPage() {
                     </button>
 
                     {/* Image */}
-                    <div className="grid h-48 place-items-center overflow-hidden rounded-lg bg-[#f7f7f7] ring-1 ring-border">
+                    <div className="h-48 overflow-hidden rounded-lg bg-[#f7f7f7] ring-1 ring-border">
                       {p.image ? (
                         <img
                           src={p.image}
                           alt={p.name}
                           loading="lazy"
-                          className="h-full w-full object-contain p-2"
+                          className="h-full w-full object-cover"
                         />
                       ) : (
-                        <span className="text-5xl">{p.emoji}</span>
+                        <div className="grid h-full w-full place-items-center">
+                          <span className="text-5xl">{p.emoji}</span>
+                        </div>
                       )}
                     </div>
 
