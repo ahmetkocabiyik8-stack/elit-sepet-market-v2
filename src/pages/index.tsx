@@ -345,51 +345,53 @@ export default function IndexPage() {
     <div className="min-h-screen bg-background pb-20 lg:pb-0">
       {/* Header */}
       <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1600px] items-center gap-6 px-6 py-3 lg:px-10">
-          <div className="flex shrink-0 items-center gap-3">
-            <div className="overflow-hidden rounded-md border border-[#0b3d2e]/70 shadow-soft" style={{ width: "clamp(56px, 6vw, 72px)" }}>
-              <img
-                src={aryomKoruImage}
-                alt="Aryom Koru 1. Etap"
-                loading="lazy"
-                className="block aspect-square w-full object-cover"
-              />
-            </div>
-            <div className="min-w-0">
-              <div className="font-display font-bold uppercase leading-none tracking-tight text-[#0b3d2e] flex items-baseline gap-1.5">
-                <span className="text-base sm:text-lg">ARYOM KORU</span>
-                <span className="text-2xl sm:text-3xl">1.</span>
-                <span className="text-base sm:text-lg text-[#0b3d2e]/80">ETAP</span>
+        <div className="mx-auto flex max-w-[1600px] flex-col gap-3 px-4 py-3 sm:px-6 lg:flex-row lg:items-center lg:gap-6 lg:px-10">
+          <div className="flex items-center justify-between gap-3 lg:contents">
+            <div className="flex min-w-0 shrink items-center gap-3 lg:order-1 lg:shrink-0">
+              <div className="shrink-0 overflow-hidden rounded-md border border-[#0b3d2e]/70 shadow-soft" style={{ width: "clamp(48px, 6vw, 72px)" }}>
+                <img
+                  src={aryomKoruImage}
+                  alt="Aryom Koru 1. Etap"
+                  loading="lazy"
+                  className="block aspect-square w-full object-cover"
+                />
               </div>
-              <div className="mt-1 text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-                Sakinlere Özel Market
+              <div className="min-w-0">
+                <div className="font-display font-bold uppercase leading-none tracking-tight text-[#0b3d2e] flex items-baseline gap-1.5">
+                  <span className="text-sm sm:text-lg">ARYOM KORU</span>
+                  <span className="text-xl sm:text-3xl">1.</span>
+                  <span className="text-sm sm:text-lg text-[#0b3d2e]/80">ETAP</span>
+                </div>
+                <div className="mt-1 truncate text-[9px] uppercase tracking-[0.18em] text-muted-foreground sm:text-[10px] sm:tracking-[0.22em]">
+                  Sakinlere Özel Market
+                </div>
               </div>
             </div>
+
+            <button
+              onClick={() => setCartOpen(true)}
+              aria-label="Sepeti aç"
+              className="relative hidden shrink-0 items-center gap-2 rounded-full border border-gold bg-gold px-4 py-2.5 text-sm font-semibold text-gold-foreground shadow-[var(--shadow-green)] transition hover:opacity-90 lg:order-3 lg:flex lg:px-5 lg:py-3"
+            >
+              <ShoppingBag className="h-5 w-5 text-gold-foreground" strokeWidth={1.8} />
+              <span className="hidden sm:inline">Sepetim</span>
+              <span className="rounded-full bg-white/25 px-2 py-0.5 text-xs font-bold text-gold-foreground">
+                {itemCount}
+              </span>
+              <span className="hidden md:inline text-gold-foreground/80">·</span>
+              <span className="hidden md:inline font-semibold">₺{total.toFixed(2)}</span>
+            </button>
           </div>
 
-          <div className="relative flex-1">
+          <div className="relative lg:order-2 lg:flex-1">
             <Search className="pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" strokeWidth={1.5} />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Ürün, marka veya kategori arayın…"
-              className="h-14 w-full rounded-full border border-border bg-secondary/50 pl-14 pr-6 text-base text-foreground placeholder:text-muted-foreground/70 outline-none transition focus:border-gold/60 focus:bg-card focus:ring-4 focus:ring-gold/10"
+              className="h-12 w-full rounded-full border border-border bg-secondary/50 pl-14 pr-6 text-base text-foreground placeholder:text-muted-foreground/70 outline-none transition focus:border-gold/60 focus:bg-card focus:ring-4 focus:ring-gold/10 lg:h-14"
             />
           </div>
-
-          <button
-            onClick={() => setCartOpen(true)}
-            aria-label="Sepeti aç"
-            className="relative flex shrink-0 items-center gap-2 rounded-full border border-gold bg-gold px-5 py-3 text-sm font-semibold text-gold-foreground shadow-[var(--shadow-green)] transition hover:opacity-90"
-          >
-            <ShoppingBag className="h-5 w-5 text-gold-foreground" strokeWidth={1.8} />
-            <span className="hidden sm:inline">Sepetim</span>
-            <span className="rounded-full bg-gold px-2 py-0.5 text-xs font-bold text-gold-foreground">
-              {itemCount}
-            </span>
-            <span className="hidden md:inline text-muted-foreground">·</span>
-            <span className="hidden md:inline font-semibold">₺{total.toFixed(2)}</span>
-          </button>
         </div>
       </header>
 
@@ -448,9 +450,23 @@ export default function IndexPage() {
         <main>
           <div className="mb-6 flex items-start justify-between gap-4">
             <div>
-              <div className="text-[11px] uppercase tracking-[0.22em] text-gold">
+              <div className="hidden text-[11px] uppercase tracking-[0.22em] text-gold lg:block">
                 Aryom Market · Rezidans 168
               </div>
+              <button
+                onClick={() => setCartOpen(true)}
+                aria-label="Sepeti aç"
+                className="relative inline-flex items-center gap-1.5 rounded-full border border-gold bg-gold px-3 py-1.5 text-xs font-semibold text-gold-foreground shadow-[var(--shadow-green)] transition hover:opacity-90 lg:hidden"
+              >
+                <ShoppingBag className="h-3.5 w-3.5" strokeWidth={1.8} />
+                Sepetim
+                <span className="rounded-full bg-white/25 px-1.5 py-0.5 text-[10px] font-bold text-gold-foreground">
+                  {itemCount}
+                </span>
+                {itemCount > 0 && (
+                  <span className="ml-0.5 font-semibold">· ₺{total.toFixed(2)}</span>
+                )}
+              </button>
               <h1 className="mt-1.5 font-display text-3xl leading-tight text-foreground">
                 {categories.find((c) => c.id === activeCat)?.name ?? "Tümü"}
               </h1>
@@ -1023,18 +1039,24 @@ function CheckoutModal({
             <div className="mb-2 text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
               Sepet Özeti
             </div>
-            <ul className="max-h-40 space-y-1.5 overflow-y-auto pr-1 text-sm">
+            <ul className="max-h-56 space-y-2 overflow-y-auto pr-1">
               {cartItems.map((i) => (
-                <li key={i.id} className="flex items-center justify-between gap-3 text-foreground/90">
-                  <span className="truncate">
-                    <span className="mr-2">{i.emoji}</span>
+                <li key={i.id} className="flex items-center gap-3 rounded-xl border border-border bg-secondary/30 px-2.5 py-2">
+                  <div className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-lg border border-border bg-card text-lg">
+                    {i.image ? (
+                      <img src={i.image} alt={i.name} loading="lazy" className="h-full w-full object-contain p-1" />
+                    ) : (
+                      i.emoji
+                    )}
+                  </div>
+                  <span className="min-w-0 flex-1 truncate text-sm text-foreground/90">
                     {i.name} <span className="text-muted-foreground">× {i.qty}</span>
                   </span>
-                  <span className="shrink-0 tabular-nums">₺{(effectivePrice(i) * i.qty).toFixed(2)}</span>
+                  <span className="shrink-0 text-sm font-semibold tabular-nums text-foreground">₺{(effectivePrice(i) * i.qty).toFixed(2)}</span>
                 </li>
               ))}
               {cartItems.length === 0 && (
-                <li className="text-muted-foreground">Sepetiniz boş.</li>
+                <li className="text-sm text-muted-foreground">Sepetiniz boş.</li>
               )}
             </ul>
             <div className="mt-3 flex items-baseline justify-between border-t border-border pt-3">
