@@ -607,7 +607,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                               {uploadingId === p.id ? (
                                 <span className="text-[10px] text-muted-foreground">Yükleniyor...</span>
                               ) : p.image ? (
-                                <img src={p.image} alt={p.name} className="h-full w-full object-contain p-1" />
+                                <img src={p.image} alt={p.name} className="h-full w-full object-cover" />
                               ) : (
                                 <span className="text-2xl">{p.emoji}</span>
                               )}
