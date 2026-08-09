@@ -692,51 +692,62 @@ export default function IndexPage() {
             </div>
           ) : (
             <>
-              <ul className="flex-1 divide-y divide-border overflow-y-auto">
+              <ul className="flex-1 space-y-2.5 overflow-y-auto px-4 py-4">
                 {cartItems.map((i) => (
-                  <li key={i.id} className="flex items-center gap-3 px-6 py-4">
-                    <div className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-lg bg-secondary text-xl">
+                  <li
+                    key={i.id}
+                    className="flex items-center gap-3 rounded-2xl border border-border bg-card px-3 py-3 shadow-[var(--shadow-card)]"
+                  >
+                    <div className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-xl border border-border bg-secondary/60 text-2xl">
                       {i.image ? (
-                        <img src={i.image} alt={i.name} loading="lazy" className="h-full w-full  object-contain p-2"  />
+                        <img src={i.image} alt={i.name} loading="lazy" className="h-full w-full object-contain p-1.5" />
                       ) : (
                         i.emoji
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-sm font-medium text-foreground">
+                      <div className="truncate text-sm font-semibold text-foreground">
                         {i.name}
                       </div>
-                      <div className="text-xs text-muted-foreground">
-                        ₺{effectivePrice(i).toFixed(2)} / {i.unit}
+                      <div className="mt-0.5 flex items-baseline gap-1.5 text-xs text-muted-foreground">
+                        <span className="font-semibold text-[var(--orange)]">₺{effectivePrice(i).toFixed(2)}</span>
+                        <span>/ {i.unit}</span>
                         {discountPercent(i) > 0 && (
-                          <span className="ml-2 text-muted-foreground line-through">₺{i.price.toFixed(2)}</span>
+                          <span className="text-muted-foreground/70 line-through">₺{i.price.toFixed(2)}</span>
                         )}
                       </div>
+                      <div className="mt-2 flex items-center justify-between">
+                        <div className="flex items-center gap-1 rounded-full border border-border bg-secondary/40 p-0.5">
+                          <button
+                            onClick={() => dec(i.id)}
+                            className="grid h-7 w-7 place-items-center rounded-full text-foreground transition hover:bg-card"
+                          >
+                            <Minus className="h-3 w-3" />
+                          </button>
+                          <span className="min-w-[20px] text-center text-xs font-bold text-foreground">
+                            {i.qty}
+                          </span>
+                          <button
+                            onClick={() => add(i.id)}
+                            className="grid h-7 w-7 place-items-center rounded-full text-foreground transition hover:bg-card"
+                          >
+                            <Plus className="h-3 w-3" />
+                          </button>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-bold tabular-nums text-foreground">
+                            ₺{(effectivePrice(i) * i.qty).toFixed(2)}
+                          </span>
+                          <button
+                            onClick={() => remove(i.id)}
+                            aria-label="Kaldır"
+                            className="grid h-7 w-7 place-items-center rounded-full text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1 rounded-full border border-border p-0.5">
-                      <button
-                        onClick={() => dec(i.id)}
-                        className="grid h-7 w-7 place-items-center rounded-full text-foreground transition hover:bg-secondary"
-                      >
-                        <Minus className="h-3 w-3" />
-                      </button>
-                      <span className="min-w-[20px] text-center text-xs font-semibold text-foreground">
-                        {i.qty}
-                      </span>
-                      <button
-                        onClick={() => add(i.id)}
-                        className="grid h-7 w-7 place-items-center rounded-full text-foreground transition hover:bg-secondary"
-                      >
-                        <Plus className="h-3 w-3" />
-                      </button>
-                    </div>
-                    <button
-                      onClick={() => remove(i.id)}
-                      aria-label="Kaldır"
-                      className="grid h-7 w-7 place-items-center rounded-full text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
                   </li>
                 ))}
               </ul>
