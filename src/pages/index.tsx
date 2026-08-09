@@ -389,9 +389,9 @@ export default function IndexPage() {
       <HeroSlider slides={heroSlides} />
 
       {/* Body layout */}
-      <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-8 px-6 py-8 lg:grid-cols-[220px_minmax(0,1fr)] lg:px-10">
-        {/* Sidebar categories */}
-        <aside className="lg:sticky lg:top-28 lg:h-fit">
+      <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-4 px-6 py-5 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-8 lg:px-10 lg:py-8">
+        {/* Sidebar categories — sadece masaüstünde görünür, telefonda yatay şerit zaten var */}
+        <aside className="hidden lg:block lg:sticky lg:top-28 lg:h-fit">
           <div className="mb-3 flex items-baseline justify-between">
             <h2 className="font-display text-xl text-foreground">Kategoriler</h2>
             <span className="text-xs text-muted-foreground">{products.length} ürün</span>
