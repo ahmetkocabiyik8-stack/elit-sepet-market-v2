@@ -541,7 +541,7 @@ export default function IndexPage() {
                       </div>
                     )}
                     {pct > 0 && (
-                      <div className={`absolute ${isFirsat ? "left-2 top-7" : "left-2 top-2"} z-10 rounded-full bg-red-600 px-2 py-0.5 text-[9px] font-extrabold tracking-wide text-white`}>
+                      <div className={`absolute ${isFirsat ? "left-2 top-7" : "left-2 top-2"} z-10 rounded-full bg-[var(--orange)] px-2 py-0.5 text-[9px] font-extrabold tracking-wide text-white`}>
                         %{pct}
                       </div>
                     )}
@@ -588,7 +588,7 @@ export default function IndexPage() {
                         {pct > 0 ? (
                           <>
                             <div className="text-[10px] font-medium text-muted-foreground line-through">₺{p.price.toFixed(2)}</div>
-                            <div className="text-lg font-bold leading-none tracking-tight text-red-600">₺{effectivePrice(p).toFixed(2)}</div>
+                            <div className="text-lg font-bold leading-none tracking-tight text-[var(--orange)]">₺{effectivePrice(p).toFixed(2)}</div>
                           </>
                         ) : (
                           <div className="text-lg font-bold leading-none tracking-tight text-gold">₺{p.price.toFixed(2)}</div>
@@ -596,7 +596,7 @@ export default function IndexPage() {
                         <div className="mt-0.5 text-[10px] text-muted-foreground">/ {p.unit}</div>
                         {stockLimited && (
                           reachedLimit ? (
-                            <div className="mt-0.5 text-[10px] font-bold text-red-600">Tükendi</div>
+                            <div className="mt-0.5 text-[10px] font-bold text-[var(--orange)]">Tükendi</div>
                           ) : (
                             <div className="mt-0.5 text-[10px] font-medium text-muted-foreground">
                               Stokta {Math.max((p.stock as number) - qty, 0)} adet
