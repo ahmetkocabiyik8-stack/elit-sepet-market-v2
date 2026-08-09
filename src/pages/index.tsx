@@ -76,7 +76,7 @@ function CertifiedProductBox({ media, title, showCerts, onOpen }: { media: Promo
   return (
     <Wrapper
       onClick={showCerts ? onOpen : undefined}
-      className={`group relative h-[220px] w-[220px] shrink-0 overflow-hidden rounded-2xl border border-border bg-card text-left shadow-[var(--shadow-soft)] transition sm:h-[250px] sm:w-[250px] ${showCerts ? "hover:-translate-y-0.5" : ""}`}
+      className={`group relative h-[248px] w-[220px] shrink-0 overflow-hidden rounded-2xl border border-border bg-card text-left shadow-[var(--shadow-soft)] transition sm:h-[250px] sm:w-[250px] ${showCerts ? "hover:-translate-y-0.5" : ""}`}
     >
       <span className="absolute left-2.5 top-2.5 z-10 rounded-full bg-[var(--orange)] px-2.5 py-1 text-[10px] font-bold text-white shadow-[var(--shadow-orange)]">
         YENİ ÜRÜN
@@ -84,14 +84,14 @@ function CertifiedProductBox({ media, title, showCerts, onOpen }: { media: Promo
       {media.type === "video" ? (
         <video
           src={media.src}
-          className="h-[62%] w-full object-cover bg-black"
+          className="h-[56%] w-full object-cover bg-black sm:h-[62%]"
           autoPlay
           muted
           loop
           playsInline
         />
       ) : (
-        <img src={media.src} alt="Ürün" className="h-[62%] w-full object-contain bg-white p-2" loading="lazy" />
+        <img src={media.src} alt="Ürün" className="h-[56%] w-full object-contain bg-white p-2 sm:h-[62%]" loading="lazy" />
       )}
       <div className="px-3.5 pb-3 pt-2">
         <h4 className="font-display text-[13.5px] leading-tight text-foreground">{title}</h4>
@@ -102,12 +102,14 @@ function CertifiedProductBox({ media, title, showCerts, onOpen }: { media: Promo
             <span className="rounded-md bg-amber-500/10 px-1.5 py-0.5 text-[8.5px] font-bold text-amber-600">✓ Hijyen</span>
           </div>
         )}
+        {showCerts && (
+          <div className="mt-2 flex justify-end">
+            <span className="rounded-full bg-black/55 px-2 py-1 text-[8.5px] font-medium text-white">
+              Belgeleri gör →
+            </span>
+          </div>
+        )}
       </div>
-      {showCerts && (
-        <span className="absolute bottom-2.5 right-2.5 rounded-full bg-black/55 px-2 py-1 text-[8.5px] font-medium text-white">
-          Belgeleri gör →
-        </span>
-      )}
     </Wrapper>
   );
 }
