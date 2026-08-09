@@ -275,12 +275,20 @@ export default function IndexPage() {
       localStorage.setItem("aryom_favorites_v1", JSON.stringify([...next]));
       return next;
     });
-  const [form, setForm] = useState({
-    name: "",
-    phone: "",
-    apartmentCode: "",
-    payment: "kart" as "kart" | "nakit",
-    note: "",
+  const CUSTOMER_INFO_KEY = "aryom_customer_info_v1";
+  const [form, setForm] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(CUSTOMER_INFO_KEY) || "{}");
+      return {
+        name: saved.name || "",
+        phone: "",
+        apartmentCode: saved.apartmentCode || "",
+        payment: (saved.payment === "nakit" ? "nakit" : "kart") as "kart" | "nakit",
+        note: "",
+      };
+    } catch {
+      return { name: "", phone: "", apartmentCode: "", payment: "kart" as "kart" | "nakit", note: "" };
+    }
   });
 
   const filtered = useMemo(() => {
@@ -773,6 +781,12 @@ export default function IndexPage() {
         cartItems={cartItems}
         total={total}
         onSuccess={() => {
+          try {
+            localStorage.setItem(
+              CUSTOMER_INFO_KEY,
+              JSON.stringify({ name: form.name, apartmentCode: form.apartmentCode, payment: form.payment })
+            );
+          } catch {}
           setCart({});
           setCheckoutOpen(false);
         }}
@@ -882,8 +896,8 @@ function CheckoutModal({
     if (!canSubmit) return;
     const text = encodeURIComponent(buildMessage());
     const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
-    window.open(url, "_blank", "noopener,noreferrer");
     onSuccess();
+    window.location.href = url;
   };
 
   return (
