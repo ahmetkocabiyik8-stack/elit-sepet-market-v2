@@ -358,11 +358,11 @@ export default function IndexPage() {
               </div>
               <div className="min-w-0">
                 <div className="font-display font-bold uppercase leading-none tracking-tight text-[#0b3d2e] flex items-baseline gap-1.5">
-                  <span className="text-sm sm:text-lg">ARYOM KORU</span>
-                  <span className="text-xl sm:text-3xl">1.</span>
-                  <span className="text-sm sm:text-lg text-[#0b3d2e]/80">ETAP</span>
+                  <span className="text-lg sm:text-lg">ARYOM KORU</span>
+                  <span className="text-2xl sm:text-3xl">1.</span>
+                  <span className="text-lg sm:text-lg text-[#0b3d2e]">ETAP</span>
                 </div>
-                <div className="mt-1 truncate text-[9px] uppercase tracking-[0.18em] text-muted-foreground sm:text-[10px] sm:tracking-[0.22em]">
+                <div className="mt-1 truncate text-[11px] font-semibold uppercase tracking-[0.16em] text-[#0b3d2e]/70 sm:text-[10px] sm:font-normal sm:tracking-[0.22em] sm:text-muted-foreground">
                   Sakinlere Özel Market
                 </div>
               </div>
