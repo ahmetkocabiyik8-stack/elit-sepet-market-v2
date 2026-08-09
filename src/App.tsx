@@ -39,7 +39,7 @@ function SplashScreen({ onDone }: { onDone: () => void }) {
   }, [onDone]);
   return (
     <div
-      className={`fixed inset-0 z-[100] flex lg:hidden flex-col items-center justify-end overflow-hidden transition-opacity duration-[450ms] ${
+      className={`fixed inset-0 z-[100] flex flex-col items-center justify-end overflow-hidden transition-opacity duration-[450ms] ${
         fading ? "opacity-0" : "opacity-100"
       }`}
     >
