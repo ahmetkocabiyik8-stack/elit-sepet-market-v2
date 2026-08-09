@@ -416,6 +416,7 @@ export default function IndexPage() {
           <nav className="flex flex-col gap-0.5">
             {categories.map((c) => {
               const active = activeCat === c.id;
+              const count = c.id === "all" ? products.length : products.filter((p) => p.category === c.id).length;
               return (
                 <button
                   key={c.id}
@@ -427,7 +428,10 @@ export default function IndexPage() {
                   }`}
                 >
                   <span>{c.name}</span>
-                  {active && <span className="h-1.5 w-1.5 rounded-full bg-gold" />}
+                  <span className="flex items-center gap-1.5">
+                    <span className={`text-xs ${active ? "text-gold/70" : "text-muted-foreground/60"}`}>{count}</span>
+                    {active && <span className="h-1.5 w-1.5 rounded-full bg-gold" />}
+                  </span>
                 </button>
               );
             })}
