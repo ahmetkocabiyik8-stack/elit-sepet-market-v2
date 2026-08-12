@@ -1,0 +1,23 @@
+{
+  "name": "Elit Sepet Market",
+  "short_name": "Elit Sepet",
+  "description": "Aryom Koru 1. Etap sakinlerine özel sanal market.",
+  "start_url": "/?source=pwa",
+  "id": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFF6E8",
+  "theme_color": "#D2691E",
+  "lang": "tr",
+  "icons": [
+    { "src": "/icons/icon-72-v2.png", "sizes": "72x72", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-96-v2.png", "sizes": "96x96", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-144-v2.png", "sizes": "144x144", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-152-v2.png", "sizes": "152x152", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-192-v2.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512-v2.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-192-v2.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/icon-maskable-512-v2.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
